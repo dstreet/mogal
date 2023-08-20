@@ -8,8 +8,8 @@ import (
 	"context"
 	"time"
 
-	gql "github.com/99designs/gqlgen/graphql"
 	"github.com/dstreet/mogal/internal/graphql/model"
+	"github.com/dstreet/mogal/internal/http"
 )
 
 // Login is the resolver for the login field.
@@ -19,7 +19,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	u, err := r.Resolver.UserRepository.Login(ctx, input.Email, input.Password)
 	if err != nil {
 		r.Logger.Error("failed to authenticate user", "email", input.Email, "err", err)
-		gql.AddError(ctx, err)
 		return nil, err
 	}
 
@@ -28,7 +27,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	token, err := r.TokenProvider.CreateToken(u, time.Second*900)
 	if err != nil {
 		r.Logger.Error("failed to create token for user", "ID", u.ID, "err", err)
-		gql.AddError(ctx, err)
 		return nil, err
 	}
 
@@ -47,7 +45,6 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	u, err := r.Resolver.UserRepository.Create(ctx, input.Email, input.Password)
 	if err != nil {
 		r.Logger.Error("failed to create user", "email", input.Email, "err", err)
-		gql.AddError(ctx, err)
 		return nil, err
 	}
 
@@ -56,11 +53,32 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 	token, err := r.TokenProvider.CreateToken(u, time.Second*900)
 	if err != nil {
 		r.Logger.Error("failed to create token for user", "ID", u.ID, "err", err)
-		gql.AddError(ctx, err)
 		return nil, err
 	}
 
 	r.Logger.Debug("generated token for user", "ID", u.ID)
+
+	return &model.Authorization{
+		Token:     token,
+		ExpiresIn: 900,
+	}, nil
+}
+
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.Authorization, error) {
+	r.Logger.Info("refreshing user token")
+	user := http.UserForContext(ctx)
+	if user == nil {
+		return nil, http.ErrUnauthorized
+	}
+
+	token, err := r.TokenProvider.CreateToken(*user, time.Second*900)
+	if err != nil {
+		r.Logger.Error("failed to create token for user", "ID", user.ID, "err", err)
+		return nil, err
+	}
+
+	r.Logger.Debug("generated token for user", "ID", user.ID)
 
 	return &model.Authorization{
 		Token:     token,

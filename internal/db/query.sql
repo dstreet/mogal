@@ -3,6 +3,11 @@ SELECT * FROM users
 WHERE email = $1
 LIMIT 1;
 
+-- name: GetUserWithId :one
+SELECT * FROM users
+WHERE id = $1
+LIMIT 1;
+
 -- name: DeleteUser :one
 UPDATE users
 SET deleted_at = NOW()

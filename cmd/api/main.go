@@ -12,6 +12,7 @@ import (
 	"github.com/dstreet/mogal/internal/auth"
 	"github.com/dstreet/mogal/internal/db"
 	"github.com/dstreet/mogal/internal/graphql"
+	mhttp "github.com/dstreet/mogal/internal/http"
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
@@ -70,26 +71,35 @@ func main() {
 		dbName,
 	)
 
-	fmt.Println(cs)
 	conn, err := sql.Open("postgres", cs)
 	if err != nil {
 		panic(err)
 	}
 
+	userRepo := db.NewDBUserRepository(
+		logger.WithGroup("UserRepository"),
+		conn,
+		auth.NewBcryptPasswordHasher(12),
+	)
+
+	tokenProvider := auth.NewJWTProvider(authIssuer, authSigningKey)
+
+	authMiddleware := &mhttp.AuthMiddleware{
+		Logger:         logger.WithGroup("Auth Middleware"),
+		UserRepository: userRepo,
+		TokenProvider:  tokenProvider,
+	}
+
 	resolver := &graphql.Resolver{
-		Logger: logger.WithGroup("Resolver"),
-		UserRepository: db.NewDBUserRepository(
-			logger.WithGroup("UserRepository"),
-			conn,
-			auth.NewBcryptPasswordHasher(12),
-		),
-		TokenProvider: auth.NewJWTProvider(authIssuer, authSigningKey),
+		Logger:         logger.WithGroup("Resolver"),
+		UserRepository: userRepo,
+		TokenProvider:  tokenProvider,
 	}
 
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
+	http.Handle("/graphql", authMiddleware.Handler(srv))
 
 	logger.Info("connect to http://localhost:%s/ for GraphQL playground", "port", port)
 	err = http.ListenAndServe(":"+port, nil)

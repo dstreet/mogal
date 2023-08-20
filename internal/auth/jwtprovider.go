@@ -19,6 +19,7 @@ func NewJWTProvider(issuer string, signingKey string) *JWTProvider {
 	}
 }
 
+// Generate a new authorization token for the user.
 func (p *JWTProvider) CreateToken(u user.User, expires time.Duration) (string, error) {
 	claims := jwt.RegisteredClaims{
 		Issuer:    p.issuer,
@@ -36,6 +37,35 @@ func (p *JWTProvider) CreateToken(u user.User, expires time.Duration) (string, e
 	return signed, nil
 }
 
-func (p *JWTProvider) VerifyToken(token string) bool {
-	return true
+// Verify that the authorization token is valid.
+func (p *JWTProvider) VerifyToken(token string) (string, error) {
+	var userID string
+
+	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return userID, ErrUnexpectedSigningTyp
+		}
+
+		return []byte(p.signingKey), nil
+	})
+
+	if err != nil {
+		return userID, err
+	}
+
+	issuer, err := t.Claims.GetIssuer()
+	if err != nil {
+		return userID, err
+	}
+
+	if issuer != p.issuer {
+		return userID, ErrMismatchedIssuer
+	}
+
+	userID, err = t.Claims.GetSubject()
+	if err != nil {
+		return userID, err
+	}
+
+	return userID, err
 }

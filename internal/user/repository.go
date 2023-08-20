@@ -12,4 +12,7 @@ type UserRepository interface {
 	// Verify that the user exists with the provided credentials and perform a
 	// login operation.
 	Login(ctx context.Context, email string, password string) (User, error)
+
+	// Get a user with the provided ID.
+	GetWithID(ctx context.Context, ID string) (User, error)
 }

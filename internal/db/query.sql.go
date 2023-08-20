@@ -86,6 +86,26 @@ func (q *Queries) GetUserWithEmail(ctx context.Context, email string) (User, err
 	return i, err
 }
 
+const getUserWithId = `-- name: GetUserWithId :one
+SELECT id, email, password, created_at, deleted_at, last_login FROM users
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetUserWithId(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserWithId, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.DeletedAt,
+		&i.LastLogin,
+	)
+	return i, err
+}
+
 const updateLastLogin = `-- name: UpdateLastLogin :exec
 UPDATE users
 SET last_login = NOW()

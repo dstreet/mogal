@@ -1,6 +1,7 @@
 type Mutation {
   login(input: LoginInput!): Authorization!
   register(input: RegisterInput!): Authorization!
+  refreshToken: Authorization!
 }
 
 type Query {

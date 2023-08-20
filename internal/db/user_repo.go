@@ -70,7 +70,7 @@ func (repo *DBUserRepository) Delete(ctx context.Context, ID string) (user.User,
 
 	uuidID, err := uuid.FromString(ID)
 	if err != nil {
-		repo.logger.Error("invalid id when deleting user", "id", ID)
+		repo.logger.Error("invalid uuid when deleting user", "id", ID)
 		return userObj, user.ErrInvalidID
 	}
 
@@ -106,6 +106,28 @@ func (repo *DBUserRepository) Login(ctx context.Context, email string, password 
 	if err != nil {
 		repo.logger.Error("failed to update last login date for user", "id", u.ID.String())
 		return userObj, &user.LoginFailedError{ID: u.ID.String()}
+	}
+
+	userObj = updateUserObjectWithDBUser(userObj, u)
+
+	return userObj, nil
+}
+
+// Get the user from the provided ID
+func (repo *DBUserRepository) GetWithID(ctx context.Context, ID string) (user.User, error) {
+	var userObj user.User
+	repo.logger.Info("getting user", "ID", ID)
+
+	uuidID, err := uuid.FromString(ID)
+	if err != nil {
+		repo.logger.Error("invalid uuid when getting user", "id", ID)
+		return userObj, user.ErrInvalidID
+	}
+
+	u, err := repo.queries.GetUserWithId(ctx, uuidID)
+	if err != nil {
+		repo.logger.Error("failed to get user from DB", "err", err)
+		return userObj, err
 	}
 
 	userObj = updateUserObjectWithDBUser(userObj, u)
