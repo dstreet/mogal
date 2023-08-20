@@ -99,7 +99,7 @@ func main() {
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
-	http.Handle("/graphql", authMiddleware.Handler(srv))
+	http.Handle("/graphql", mhttp.CORSMiddleware(authMiddleware.Handler(srv)))
 
 	logger.Info("connect to http://localhost:%s/ for GraphQL playground", "port", port)
 	err = http.ListenAndServe(":"+port, nil)
