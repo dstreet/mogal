@@ -1,0 +1,12 @@
+version: '2'
+
+sql:
+  - engine: postgresql
+    queries: internal/db/query.sql
+    schema: internal/db/migrations
+    gen:
+      go:
+        out: internal/db
+        overrides:
+          - db_type: "uuid"
+            go_type: "github.com/gofrs/uuid.UUID"

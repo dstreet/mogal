@@ -1,0 +1,41 @@
+version: '3'
+
+dotenv:
+  - .env
+
+env:
+  DATABASE_URL: postgres://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:5432/{{.DB_NAME}}?sslmode=disable
+  DBMATE_MIGRATIONS_DIR: internal/db/migrations
+
+tasks:
+  setup:
+    cmds:
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+      - go install github.com/vektra/mockery/v2@v2.32.4
+
+  sqlc:
+    cmds:
+      - sqlc generate
+
+  gql:
+    cmds:
+      - go run github.com/99designs/gqlgen generate
+
+  generate:
+    deps: [sqlc, gql]
+
+  dev:api:
+    cmds:
+      - go run cmd/api/main.go
+
+  run:
+    cmds:
+      - docker-compose up
+
+  build:api:
+    cmds:
+      - go build -o build/api cmd/api/main.go
+
+  migrate:
+    cmds:
+      - npx dbmate {{ .CLI_ARGS }}

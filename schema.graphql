@@ -1,0 +1,23 @@
+type Mutation {
+  login(input: LoginInput!): Authorization!
+  register(input: RegisterInput!): Authorization!
+}
+
+type Query {
+  hello: String!
+}
+
+type Authorization {
+  token: String!
+  expires_in: Int! 
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+}
