@@ -5,29 +5,44 @@
 package db
 
 import (
-	"database/sql"
-	"time"
-
 	"github.com/gofrs/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Genre struct {
+	ID   uuid.UUID
+	User uuid.UUID
+	Name string
+}
 
 type Movie struct {
 	ID         uuid.UUID
 	Title      string
 	Rating     string
-	Genre      string
 	Cast       []string
 	Director   string
-	Poster     sql.NullString
+	Poster     pgtype.Text
 	User       uuid.UUID
-	UserRating sql.NullInt32
+	UserRating pgtype.Int4
+}
+
+type MovieGenre struct {
+	ID    uuid.UUID
+	Movie uuid.UUID
+	Genre uuid.UUID
 }
 
 type User struct {
 	ID        uuid.UUID
 	Email     string
 	Password  string
-	CreatedAt time.Time
-	DeletedAt sql.NullTime
-	LastLogin time.Time
+	CreatedAt pgtype.Timestamp
+	DeletedAt pgtype.Timestamp
+	LastLogin pgtype.Timestamp
+}
+
+type UserMovie struct {
+	ID    uuid.UUID
+	User  uuid.UUID
+	Movie uuid.UUID
 }

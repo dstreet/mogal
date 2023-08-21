@@ -138,8 +138,8 @@ func (repo *DBUserRepository) GetWithID(ctx context.Context, ID string) (user.Us
 func updateUserObjectWithDBUser(userObj user.User, dbUser User) user.User {
 	userObj.ID = dbUser.ID.String()
 	userObj.Email = dbUser.Email
-	userObj.CreatedAt = dbUser.CreatedAt
-	userObj.LastLogin = dbUser.LastLogin
+	userObj.CreatedAt = dbUser.CreatedAt.Time
+	userObj.LastLogin = dbUser.LastLogin.Time
 
 	userObj.Active = !dbUser.DeletedAt.Valid
 

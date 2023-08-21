@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -14,7 +13,9 @@ import (
 	"github.com/dstreet/mogal/internal/db"
 	"github.com/dstreet/mogal/internal/graphql"
 	mhttp "github.com/dstreet/mogal/internal/http"
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+	"golang.org/x/net/context"
 
 	_ "github.com/lib/pq"
 )
@@ -72,7 +73,8 @@ func main() {
 		dbName,
 	)
 
-	conn, err := sql.Open("postgres", cs)
+	// conn, err := sql.Open("postgres", cs)
+	conn, err := pgx.Connect(context.TODO(), cs)
 	if err != nil {
 		panic(err)
 	}
@@ -81,6 +83,16 @@ func main() {
 		logger.WithGroup("UserRepository"),
 		conn,
 		auth.NewBcryptPasswordHasher(12),
+	)
+
+	genreRepo := db.NewDBGenreRepository(
+		logger.WithGroup("GenreRepository"),
+		conn,
+	)
+
+	movieRepo := db.NewDBMovieRepository(
+		logger.WithGroup("MovieRepository"),
+		conn,
 	)
 
 	tokenProvider := auth.NewJWTProvider(authIssuer, authSigningKey, time.Second*900)
@@ -92,9 +104,11 @@ func main() {
 	}
 
 	resolver := &graphql.Resolver{
-		Logger:         logger.WithGroup("Resolver"),
-		UserRepository: userRepo,
-		TokenProvider:  tokenProvider,
+		Logger:          logger.WithGroup("Resolver"),
+		UserRepository:  userRepo,
+		GenreRepository: genreRepo,
+		MovieRepository: movieRepo,
+		TokenProvider:   tokenProvider,
 	}
 
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))

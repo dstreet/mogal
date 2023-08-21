@@ -7,9 +7,48 @@ type Authorization struct {
 	ExpiresIn int    `json:"expires_in"`
 }
 
+type CreateGenreInput struct {
+	Name string `json:"name"`
+}
+
+type CreateMovieInput struct {
+	Title      string   `json:"title"`
+	Rating     string   `json:"rating"`
+	Cast       []string `json:"cast"`
+	Director   string   `json:"director"`
+	Poster     *string  `json:"poster,omitempty"`
+	UserRating *int     `json:"userRating,omitempty"`
+	Genres     []string `json:"genres"`
+}
+
+type Genre struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type ListMoviesInput struct {
+	Genre *string `json:"genre,omitempty"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type Movie struct {
+	ID         string   `json:"id"`
+	Title      string   `json:"title"`
+	Rating     string   `json:"rating"`
+	Cast       []string `json:"cast"`
+	Director   string   `json:"director"`
+	Poster     *string  `json:"poster,omitempty"`
+	UserRating *int     `json:"userRating,omitempty"`
+	Genres     []*Genre `json:"genres"`
+}
+
+type RateMovieInput struct {
+	Movie      string `json:"movie"`
+	UserRating int    `json:"userRating"`
 }
 
 type RegisterInput struct {

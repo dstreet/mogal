@@ -7,9 +7,12 @@ package graphql
 import (
 	"context"
 	"errors"
+	"fmt"
+	"slices"
 
 	"github.com/dstreet/mogal/internal/graphql/model"
 	"github.com/dstreet/mogal/internal/http"
+	"github.com/dstreet/mogal/internal/movie"
 	"github.com/dstreet/mogal/internal/user"
 )
 
@@ -17,7 +20,7 @@ import (
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.Authorization, error) {
 	r.Logger.Info("authenticating user", "email", input.Email)
 
-	u, err := r.Resolver.UserRepository.Login(ctx, input.Email, input.Password)
+	u, err := r.UserRepository.Login(ctx, input.Email, input.Password)
 	if err != nil {
 		r.Logger.Error("failed to authenticate user", "email", input.Email, "err", err)
 
@@ -53,7 +56,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.Authorization, error) {
 	r.Logger.Info("registering new user", "email", input.Email)
 
-	u, err := r.Resolver.UserRepository.Create(ctx, input.Email, input.Password)
+	u, err := r.UserRepository.Create(ctx, input.Email, input.Password)
 	if err != nil {
 		r.Logger.Error("failed to create user", "email", input.Email, "err", err)
 		return nil, err
@@ -97,9 +100,107 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.Authorizati
 	}, nil
 }
 
-// Hello is the resolver for the hello field.
-func (r *queryResolver) Hello(ctx context.Context) (string, error) {
-	return "hello, world", nil
+// CreateGenre is the resolver for the createGenre field.
+func (r *mutationResolver) CreateGenre(ctx context.Context, input model.CreateGenreInput) (*model.Genre, error) {
+	panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
+}
+
+// CreateMovie is the resolver for the createMovie field.
+func (r *mutationResolver) CreateMovie(ctx context.Context, input model.CreateMovieInput) (*model.Movie, error) {
+	r.Logger.Info("creating new movie")
+
+	user := http.UserForContext(ctx)
+	if user == nil {
+		return nil, http.ErrUnauthorized
+	}
+
+	movieInput := movie.MovieInput{
+		Title:    input.Title,
+		Rating:   input.Rating,
+		Cast:     input.Cast,
+		Director: input.Director,
+		Poster:   input.Poster,
+		Genres:   input.Genres,
+	}
+
+	if input.UserRating != nil {
+		ur := int32(*input.UserRating)
+		movieInput.UserRating = &ur
+	}
+
+	movie, err := r.MovieRepository.CreateMovie(ctx, movieInput, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	modelMovie := &model.Movie{
+		ID:       movie.ID,
+		Title:    movie.Title,
+		Rating:   movie.Rating,
+		Cast:     movie.Cast,
+		Director: movie.Director,
+		Poster:   movie.Poster,
+	}
+
+	if movie.UserRating != nil {
+		ur := int(*movie.UserRating)
+		modelMovie.UserRating = &ur
+	}
+
+	fields := r.FieldCollector.CollectAllFields(ctx)
+	if slices.Contains(fields, "genres") {
+		genres, err := r.MovieRepository.GetGenres(ctx, movie.ID)
+		if err != nil {
+			r.Logger.Error("failed to get genres for movie", "movie", movie.ID)
+			return modelMovie, err
+		}
+
+		for _, g := range genres {
+			modelMovie.Genres = append(modelMovie.Genres, &model.Genre{
+				ID:   g.ID,
+				Name: g.Name,
+			})
+		}
+	}
+
+	return modelMovie, nil
+}
+
+// RateMovie is the resolver for the rateMovie field.
+func (r *mutationResolver) RateMovie(ctx context.Context, input model.RateMovieInput) (*model.Movie, error) {
+	panic(fmt.Errorf("not implemented: RateMovie - rateMovie"))
+}
+
+// ListMovies is the resolver for the listMovies field.
+func (r *queryResolver) ListMovies(ctx context.Context, input *model.ListMoviesInput) ([]*model.Movie, error) {
+	panic(fmt.Errorf("not implemented: ListMovies - listMovies"))
+}
+
+// ListGenres is the resolver for the listGenres field.
+func (r *queryResolver) ListGenres(ctx context.Context) ([]*model.Genre, error) {
+	r.Logger.Info("getting genres for user")
+
+	user := http.UserForContext(ctx)
+	if user == nil {
+		r.Logger.Warn("unauthenticated request")
+		return nil, http.ErrUnauthorized
+	}
+
+	genres, err := r.GenreRepository.GetAllForUser(ctx, user.ID)
+	if err != nil {
+		r.Logger.Error("failed to get genres for user", "user", user.ID)
+		return nil, err
+	}
+
+	mGenres := make([]*model.Genre, len(genres))
+	for i, g := range genres {
+		mGenres[i] = &model.Genre{
+			ID:   g.ID,
+			Name: g.Name,
+		}
+	}
+
+	return mGenres, nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -2,15 +2,36 @@ type Mutation {
   login(input: LoginInput!): Authorization!
   register(input: RegisterInput!): Authorization!
   refreshToken: Authorization!
+
+  createGenre(input: CreateGenreInput!): Genre!
+  createMovie(input: CreateMovieInput!): Movie!
+  rateMovie(input: RateMovieInput!): Movie!
 }
 
 type Query {
-  hello: String!
+  listMovies(input: ListMoviesInput): [Movie!]!
+  listGenres: [Genre!]!
 }
 
 type Authorization {
   token: String!
   expires_in: Int! 
+}
+
+type Movie {
+  id: ID!
+  title: String!
+  rating: String!
+  cast: [String!]!
+  director: String!
+  poster: String
+  userRating: Int
+  genres: [Genre!]!
+}
+
+type Genre {
+  id: ID!
+  name: String!
 }
 
 input LoginInput {
@@ -21,4 +42,27 @@ input LoginInput {
 input RegisterInput {
   email: String!
   password: String!
+}
+
+input ListMoviesInput {
+  genre: String
+}
+
+input CreateGenreInput {
+  name: String!
+}
+
+input CreateMovieInput {
+  title: String!
+  rating: String!
+  cast: [String!]!
+  director: String!
+  poster: String
+  userRating: Int
+  genres: [String!]!
+}
+
+input RateMovieInput {
+  movie: ID!
+  userRating: Int!
 }

@@ -19,7 +19,7 @@ type contextKey struct {
 	name string
 }
 
-var userCtxKey = &contextKey{"user"}
+var UserCtxKey = &contextKey{"user"}
 
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -55,13 +55,13 @@ func (m *AuthMiddleware) Handler(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), userCtxKey, &user)
+		ctx := context.WithValue(r.Context(), UserCtxKey, &user)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
 
 func UserForContext(ctx context.Context) *user.User {
-	u, _ := ctx.Value(userCtxKey).(*user.User)
+	u, _ := ctx.Value(UserCtxKey).(*user.User)
 	return u
 }
