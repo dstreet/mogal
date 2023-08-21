@@ -6,10 +6,12 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/dstreet/mogal/internal/graphql/model"
 	"github.com/dstreet/mogal/internal/http"
+	"github.com/dstreet/mogal/internal/user"
 )
 
 // Login is the resolver for the login field.
@@ -19,6 +21,11 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 	u, err := r.Resolver.UserRepository.Login(ctx, input.Email, input.Password)
 	if err != nil {
 		r.Logger.Error("failed to authenticate user", "email", input.Email, "err", err)
+
+		if errors.Is(err, user.ErrIncorrectPassword) {
+			return nil, http.ErrUnauthorized
+		}
+
 		return nil, err
 	}
 

@@ -18,8 +18,8 @@ export const useRegisterUser = () => {
     client.request(RegisterUserMutation, input)
   )
 
-  const register = (input: RegisterUserMutationVariables) => {
-    mutate(input)
+  const register = (email: string, password: string) => {
+    mutate({email, password})
   }
 
   return {

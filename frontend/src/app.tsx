@@ -1,4 +1,4 @@
-import { CssBaseline } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 import { LoginPage } from './auth/login.page';
 import { RegisterPage } from './auth/register.page';
@@ -6,12 +6,14 @@ import { RequireAuth } from './auth/require-auth';
 import { MoviesPage } from './movies/movies.page';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthContextProvider } from './auth/auth.context';
+import { theme } from './theme';
 
 const queryClient = new QueryClient()
 
 function App() {
   return (
     <>
+      <ThemeProvider theme={theme}>
       <CssBaseline/>
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>
@@ -24,6 +26,7 @@ function App() {
           </Routes>
         </AuthContextProvider>
       </QueryClientProvider>
+      </ThemeProvider>
     </>
   );
 }
