@@ -1,3 +1,9 @@
+import { Box } from "@mui/material"
+
 export const MoviesPage: React.FC = () => {
-  return <h1>Movies...</h1>
+  return (
+    <Box>
+      Movies...
+    </Box>
+  )
 }

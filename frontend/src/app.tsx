@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 import { LoginPage } from './auth/login.page';
 import { RegisterPage } from './auth/register.page';
-import { RequireAuth } from './auth/require-auth';
+import { AuthenticatedPage } from './authenticated.page';
 import { MoviesPage } from './movies/movies.page';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthContextProvider } from './auth/auth.context';
@@ -20,7 +20,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/register" element={<RegisterPage/>}/>
-            <Route path="/" element={<RequireAuth redirect="/login"/>}>
+            <Route path="/" element={<AuthenticatedPage redirect="/login"/>}>
               <Route index element={<MoviesPage />}/>
             </Route>
           </Routes>
