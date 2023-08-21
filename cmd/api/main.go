@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -82,7 +83,7 @@ func main() {
 		auth.NewBcryptPasswordHasher(12),
 	)
 
-	tokenProvider := auth.NewJWTProvider(authIssuer, authSigningKey)
+	tokenProvider := auth.NewJWTProvider(authIssuer, authSigningKey, time.Second*900)
 
 	authMiddleware := &mhttp.AuthMiddleware{
 		Logger:         logger.WithGroup("Auth Middleware"),
@@ -101,7 +102,7 @@ func main() {
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/graphql", mhttp.CORSMiddleware(authMiddleware.Handler(srv)))
 
-	logger.Info("connect to http://localhost:%s/ for GraphQL playground", "port", port)
+	logger.Info("API started", "endpoint", fmt.Sprintf("http://localhost:%s/graphql", port))
 	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		logger.Error("failed to start api server", "err", err)

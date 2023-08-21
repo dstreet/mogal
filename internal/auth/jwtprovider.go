@@ -10,21 +10,23 @@ import (
 type JWTProvider struct {
 	issuer     string
 	signingKey string
+	expiresIn  time.Duration
 }
 
-func NewJWTProvider(issuer string, signingKey string) *JWTProvider {
+func NewJWTProvider(issuer string, signingKey string, expiresIn time.Duration) *JWTProvider {
 	return &JWTProvider{
 		issuer:     issuer,
 		signingKey: signingKey,
+		expiresIn:  expiresIn,
 	}
 }
 
 // Generate a new authorization token for the user.
-func (p *JWTProvider) CreateToken(u user.User, expires time.Duration) (string, error) {
+func (p *JWTProvider) CreateToken(u user.User) (string, error) {
 	claims := jwt.RegisteredClaims{
 		Issuer:    p.issuer,
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(expires)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(p.expiresIn)),
 		Subject:   u.ID,
 	}
 
@@ -68,4 +70,8 @@ func (p *JWTProvider) VerifyToken(token string) (string, error) {
 	}
 
 	return userID, err
+}
+
+func (p *JWTProvider) TokenDuration() time.Duration {
+	return p.expiresIn
 }

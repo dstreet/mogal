@@ -7,7 +7,6 @@ package graphql
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/dstreet/mogal/internal/graphql/model"
 	"github.com/dstreet/mogal/internal/http"
@@ -26,12 +25,17 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 			return nil, http.ErrUnauthorized
 		}
 
+		var notFound *user.NotFoundError
+		if errors.As(err, &notFound) {
+			return nil, http.ErrUnauthorized
+		}
+
 		return nil, err
 	}
 
 	r.Logger.Info("successfully authenticatd user", "ID", u.ID)
 
-	token, err := r.TokenProvider.CreateToken(u, time.Second*900)
+	token, err := r.TokenProvider.CreateToken(u)
 	if err != nil {
 		r.Logger.Error("failed to create token for user", "ID", u.ID, "err", err)
 		return nil, err
@@ -41,7 +45,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 
 	return &model.Authorization{
 		Token:     token,
-		ExpiresIn: 900,
+		ExpiresIn: int(r.TokenProvider.TokenDuration().Seconds()),
 	}, nil
 }
 
@@ -57,7 +61,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 	r.Logger.Debug("created user", "ID", u.ID)
 
-	token, err := r.TokenProvider.CreateToken(u, time.Second*900)
+	token, err := r.TokenProvider.CreateToken(u)
 	if err != nil {
 		r.Logger.Error("failed to create token for user", "ID", u.ID, "err", err)
 		return nil, err
@@ -67,7 +71,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 	return &model.Authorization{
 		Token:     token,
-		ExpiresIn: 900,
+		ExpiresIn: int(r.TokenProvider.TokenDuration().Seconds()),
 	}, nil
 }
 
@@ -79,7 +83,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.Authorizati
 		return nil, http.ErrUnauthorized
 	}
 
-	token, err := r.TokenProvider.CreateToken(*user, time.Second*900)
+	token, err := r.TokenProvider.CreateToken(*user)
 	if err != nil {
 		r.Logger.Error("failed to create token for user", "ID", user.ID, "err", err)
 		return nil, err

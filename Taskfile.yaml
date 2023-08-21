@@ -23,6 +23,8 @@ tasks:
 
   generate:
     deps: [sqlc, gql]
+    cmds:
+      - go generate ./internal/...
 
   dev:api:
     cmds:

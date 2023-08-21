@@ -2,6 +2,7 @@ package user
 
 import "context"
 
+//go:generate mockery --name UserRepository
 type UserRepository interface {
 	// Create a user with the provided credentials.
 	Create(ctx context.Context, email string, password string) (User, error)
