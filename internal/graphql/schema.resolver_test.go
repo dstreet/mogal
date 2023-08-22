@@ -186,26 +186,28 @@ func Test_MutationResolver_CreateGenre(t *testing.T) {
 		user := user.User{ID: "1234567890"}
 		ctx := context.WithValue(context.Background(), http.UserCtxKey, &user)
 
-		input := model.CreateGenreInput{
-			Name: "Horror",
+		inputs := []*model.CreateGenreInput{
+			{Name: "Horror"},
 		}
 
 		id := "1234567890"
 
-		gr.EXPECT().CreateGenreForUser(mock.Anything, genre.GenreInput{
-			Name: input.Name,
+		gr.EXPECT().CreateGenresForUser(mock.Anything, []genre.GenreInput{
+			{Name: inputs[0].Name},
 		}, user.ID).
-			Return(genre.Genre{
-				ID:   id,
-				Name: input.Name,
+			Return([]genre.Genre{
+				{
+					ID:   id,
+					Name: inputs[0].Name,
+				},
 			}, nil).
 			Once()
 
-		res, err := mr.CreateGenre(ctx, input)
+		res, err := mr.CreateGenres(ctx, inputs)
 		assert.NoError(t, err)
 
-		assert.Equal(t, id, res.ID)
-		assert.Equal(t, input.Name, res.Name)
+		assert.Equal(t, id, res[0].ID)
+		assert.Equal(t, inputs[0].Name, res[0].Name)
 	})
 }
 

@@ -21,22 +21,24 @@ func (_m *MockGenreRepository) EXPECT() *MockGenreRepository_Expecter {
 	return &MockGenreRepository_Expecter{mock: &_m.Mock}
 }
 
-// CreateGenreForUser provides a mock function with given fields: ctx, genre, userID
-func (_m *MockGenreRepository) CreateGenreForUser(ctx context.Context, genre GenreInput, userID string) (Genre, error) {
+// CreateGenresForUser provides a mock function with given fields: ctx, genre, userID
+func (_m *MockGenreRepository) CreateGenresForUser(ctx context.Context, genre []GenreInput, userID string) ([]Genre, error) {
 	ret := _m.Called(ctx, genre, userID)
 
-	var r0 Genre
+	var r0 []Genre
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, GenreInput, string) (Genre, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []GenreInput, string) ([]Genre, error)); ok {
 		return rf(ctx, genre, userID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, GenreInput, string) Genre); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, []GenreInput, string) []Genre); ok {
 		r0 = rf(ctx, genre, userID)
 	} else {
-		r0 = ret.Get(0).(Genre)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]Genre)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, GenreInput, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, []GenreInput, string) error); ok {
 		r1 = rf(ctx, genre, userID)
 	} else {
 		r1 = ret.Error(1)
@@ -45,32 +47,32 @@ func (_m *MockGenreRepository) CreateGenreForUser(ctx context.Context, genre Gen
 	return r0, r1
 }
 
-// MockGenreRepository_CreateGenreForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateGenreForUser'
-type MockGenreRepository_CreateGenreForUser_Call struct {
+// MockGenreRepository_CreateGenresForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateGenresForUser'
+type MockGenreRepository_CreateGenresForUser_Call struct {
 	*mock.Call
 }
 
-// CreateGenreForUser is a helper method to define mock.On call
+// CreateGenresForUser is a helper method to define mock.On call
 //   - ctx context.Context
-//   - genre GenreInput
+//   - genre []GenreInput
 //   - userID string
-func (_e *MockGenreRepository_Expecter) CreateGenreForUser(ctx interface{}, genre interface{}, userID interface{}) *MockGenreRepository_CreateGenreForUser_Call {
-	return &MockGenreRepository_CreateGenreForUser_Call{Call: _e.mock.On("CreateGenreForUser", ctx, genre, userID)}
+func (_e *MockGenreRepository_Expecter) CreateGenresForUser(ctx interface{}, genre interface{}, userID interface{}) *MockGenreRepository_CreateGenresForUser_Call {
+	return &MockGenreRepository_CreateGenresForUser_Call{Call: _e.mock.On("CreateGenresForUser", ctx, genre, userID)}
 }
 
-func (_c *MockGenreRepository_CreateGenreForUser_Call) Run(run func(ctx context.Context, genre GenreInput, userID string)) *MockGenreRepository_CreateGenreForUser_Call {
+func (_c *MockGenreRepository_CreateGenresForUser_Call) Run(run func(ctx context.Context, genre []GenreInput, userID string)) *MockGenreRepository_CreateGenresForUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(GenreInput), args[2].(string))
+		run(args[0].(context.Context), args[1].([]GenreInput), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *MockGenreRepository_CreateGenreForUser_Call) Return(_a0 Genre, _a1 error) *MockGenreRepository_CreateGenreForUser_Call {
+func (_c *MockGenreRepository_CreateGenresForUser_Call) Return(_a0 []Genre, _a1 error) *MockGenreRepository_CreateGenresForUser_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockGenreRepository_CreateGenreForUser_Call) RunAndReturn(run func(context.Context, GenreInput, string) (Genre, error)) *MockGenreRepository_CreateGenreForUser_Call {
+func (_c *MockGenreRepository_CreateGenresForUser_Call) RunAndReturn(run func(context.Context, []GenreInput, string) ([]Genre, error)) *MockGenreRepository_CreateGenresForUser_Call {
 	_c.Call.Return(run)
 	return _c
 }
