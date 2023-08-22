@@ -11,36 +11,50 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-const createGenreForUser = `-- name: CreateGenreForUser :one
-INSERT INTO genres (
-  "name",
-  "user"
-) VALUES (
-  $1, $2
-)
-RETURNING id, "user", name
-`
-
-type CreateGenreForUserParams struct {
+type CreateGenresForUserParams struct {
 	Name string
 	User uuid.UUID
 }
 
-func (q *Queries) CreateGenreForUser(ctx context.Context, arg CreateGenreForUserParams) (Genre, error) {
-	row := q.db.QueryRow(ctx, createGenreForUser, arg.Name, arg.User)
-	var i Genre
-	err := row.Scan(&i.ID, &i.User, &i.Name)
-	return i, err
-}
-
 const getUserGenres = `-- name: GetUserGenres :many
-SELECT id, "user", name from genres
+SELECT id, "user", name FROM genres
 WHERE "user" = $1
 ORDER BY "name" ASC
 `
 
 func (q *Queries) GetUserGenres(ctx context.Context, user uuid.UUID) ([]Genre, error) {
 	rows, err := q.db.Query(ctx, getUserGenres, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Genre
+	for rows.Next() {
+		var i Genre
+		if err := rows.Scan(&i.ID, &i.User, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserGenresByName = `-- name: GetUserGenresByName :many
+SELECT id, "user", name FROM genres
+WHERE "name" = ANY($2::text[])
+AND "user" = $1
+`
+
+type GetUserGenresByNameParams struct {
+	User  uuid.UUID
+	Names []string
+}
+
+func (q *Queries) GetUserGenresByName(ctx context.Context, arg GetUserGenresByNameParams) ([]Genre, error) {
+	rows, err := q.db.Query(ctx, getUserGenresByName, arg.User, arg.Names)
 	if err != nil {
 		return nil, err
 	}

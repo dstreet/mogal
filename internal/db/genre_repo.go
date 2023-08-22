@@ -47,28 +47,50 @@ func (repo *DBGenreRepository) GetAllForUser(ctx context.Context, userID string)
 	return userGenres, nil
 }
 
-func (repo *DBGenreRepository) CreateGenreForUser(ctx context.Context, genreInput genre.GenreInput, userID string) (genre.Genre, error) {
+func (repo *DBGenreRepository) CreateGenresForUser(ctx context.Context, genreInput []genre.GenreInput, userID string) ([]genre.Genre, error) {
 	repo.logger.Info("create a new genre for user", "user", userID)
 
 	userUUID, err := uuid.FromString(userID)
 	if err != nil {
 		repo.logger.Error("invalid uuid")
-		return genre.Genre{}, err
+		return nil, err
 	}
 
-	args := CreateGenreForUserParams{
-		Name: genreInput.Name,
-		User: userUUID,
+	args := make([]CreateGenresForUserParams, len(genreInput))
+	for i, gi := range genreInput {
+		args[i] = CreateGenresForUserParams{
+			Name: gi.Name,
+			User: userUUID,
+		}
 	}
 
-	res, err := repo.queries.CreateGenreForUser(ctx, args)
+	_, err = repo.queries.CreateGenresForUser(ctx, args)
 	if err != nil {
 		repo.logger.Error("failed to create genre for user", "err", err)
-		return genre.Genre{}, err
+		return nil, err
 	}
 
-	return genre.Genre{
-		ID:   res.ID.String(),
-		Name: res.Name,
-	}, nil
+	names := make([]string, len(genreInput))
+	for i, gi := range genreInput {
+		names[i] = gi.Name
+	}
+
+	res, err := repo.queries.GetUserGenresByName(ctx, GetUserGenresByNameParams{
+		User:  userUUID,
+		Names: names,
+	})
+	if err != nil {
+		repo.logger.Error("failed to get newly creted genres", "err", err)
+		return nil, err
+	}
+
+	genres := make([]genre.Genre, len(res))
+	for i, r := range res {
+		genres[i] = genre.Genre{
+			ID:   r.ID.String(),
+			Name: r.Name,
+		}
+	}
+
+	return genres, nil
 }

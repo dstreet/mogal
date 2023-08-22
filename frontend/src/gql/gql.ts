@@ -17,6 +17,7 @@ const documents = {
     "\n  mutation RegisterUser($email: String!, $password: String!) {\n    register(input: { email: $email, password: $password}) {\n      token\n      expires_in\n    }\n  }\n": types.RegisterUserDocument,
     "\n  query ListGenres {\n    listGenres {\n      id\n      name\n    }\n  }\n": types.ListGenresDocument,
     "\n  mutation CreateMovie(\n    $title: String!\n    $rating: String!\n    $cast: [String!]!\n    $director: String!\n    $poster: String\n    $userRating: Int\n    $genres: [String!]!\n  ) {\n    createMovie(input: {\n      title: $title,\n      rating: $rating,\n      cast: $cast,\n      director: $director,\n      poster: $poster,\n      userRating: $userRating,\n      genres: $genres\n    }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n": types.CreateMovieDocument,
+    "\n  mutation CreateGenres($input: [CreateGenreInput!]!) {\n    createGenres(input: $input) {\n      id\n      name\n    }\n  }\n": types.CreateGenresDocument,
 };
 
 /**
@@ -49,6 +50,10 @@ export function graphql(source: "\n  query ListGenres {\n    listGenres {\n     
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation CreateMovie(\n    $title: String!\n    $rating: String!\n    $cast: [String!]!\n    $director: String!\n    $poster: String\n    $userRating: Int\n    $genres: [String!]!\n  ) {\n    createMovie(input: {\n      title: $title,\n      rating: $rating,\n      cast: $cast,\n      director: $director,\n      poster: $poster,\n      userRating: $userRating,\n      genres: $genres\n    }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateMovie(\n    $title: String!\n    $rating: String!\n    $cast: [String!]!\n    $director: String!\n    $poster: String\n    $userRating: Int\n    $genres: [String!]!\n  ) {\n    createMovie(input: {\n      title: $title,\n      rating: $rating,\n      cast: $cast,\n      director: $director,\n      poster: $poster,\n      userRating: $userRating,\n      genres: $genres\n    }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateGenres($input: [CreateGenreInput!]!) {\n    createGenres(input: $input) {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  mutation CreateGenres($input: [CreateGenreInput!]!) {\n    createGenres(input: $input) {\n      id\n      name\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

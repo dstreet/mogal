@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { graphql } from "../gql";
-import { CreateMovieMutationVariables } from "../gql/graphql";
 import { client } from "../api/client";
 import { Movie } from "./movie.interface";
 import { useAuth } from "../auth/auth.context";
+import { CreateGenresMutationVariables, CreateMovieMutationVariables } from "../gql/graphql";
+import { useState } from "react";
 
 const CreateMovieMutation = graphql(`
   mutation CreateMovie(
@@ -39,30 +40,64 @@ const CreateMovieMutation = graphql(`
   }
 `)
 
+const CreateGenresMutation = graphql(`
+  mutation CreateGenres($input: [CreateGenreInput!]!) {
+    createGenres(input: $input) {
+      id
+      name
+    }
+  }
+`)
+
 export const useCreateMovie = () => {
   const { token } = useAuth()
+  const headers = {
+    Authorization: `Bearer ${token}`
+  }
 
-  const { isLoading, isSuccess, error, data, mutate } = useMutation(['CreateMovie'], (input: CreateMovieMutationVariables) =>
-    client.request(CreateMovieMutation, input, {
-      Authorization: `Bearer ${token}`
-    })
+  const [error, setError] = useState<unknown>(null)
+
+  const createMovieMutation = useMutation(['CreateMovie'], (input: CreateMovieMutationVariables) =>
+    client.request(CreateMovieMutation, input, headers)
   )
+
+  const createGenreMutation = useMutation(['CreateGenre'], (input: CreateGenresMutationVariables) =>
+    client.request(CreateGenresMutation, input, headers)
+  )
+
+  const createMovie = async (movie: CreateMovieMutationVariables, newGenres: string[]) => {
+    try {
+      if (newGenres.length) {
+        const { createGenres } = await createGenreMutation.mutateAsync({ input: newGenres.map(g => ({ name: g })) })
+        const createdGeneres = createGenres.map(g => g.id)
+
+        const genres = Array.isArray(movie.genres)
+          ? [...movie.genres, ...createdGeneres]
+          : [movie.genres, ...createdGeneres]
+
+        movie.genres = genres
+      }
+      createMovieMutation.mutate(movie)
+    } catch (err) {
+      setError(err)
+    }
+  }
 
   let movie: Movie | undefined = undefined
 
-  if (data?.createMovie) {
+  if (createMovieMutation.data?.createMovie) {
     movie = {
-      ...data.createMovie,
-      poster: data.createMovie.poster ?? undefined,
-      userRating: data.createMovie.userRating ?? undefined
+      ...createMovieMutation.data.createMovie,
+      poster: createMovieMutation.data.createMovie.poster ?? undefined,
+      userRating: createMovieMutation.data.createMovie.userRating ?? undefined
     }
   }
 
   return {
-    loading: isLoading,
-    success: isSuccess,
-    error,
+    loading: createMovieMutation.isLoading,
+    success: createMovieMutation.isSuccess,
+    error: error || createMovieMutation.error,
     movie,
-    createMovie: mutate
+    createMovie
   }
 }

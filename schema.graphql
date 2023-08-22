@@ -3,7 +3,7 @@ type Mutation {
   register(input: RegisterInput!): Authorization!
   refreshToken: Authorization!
 
-  createGenre(input: CreateGenreInput!): Genre!
+  createGenres(input: [CreateGenreInput!]!): [Genre!]!
   createMovie(input: CreateMovieInput!): Movie!
   rateMovie(input: RateMovieInput!): Movie!
 }

@@ -1,13 +1,17 @@
 -- name: GetUserGenres :many
-SELECT * from genres
+SELECT * FROM genres
 WHERE "user" = $1
 ORDER BY "name" ASC;
 
--- name: CreateGenreForUser :one
+-- name: GetUserGenresByName :many
+SELECT * FROM genres
+WHERE "name" = ANY(sqlc.arg(names)::text[])
+AND "user" = $1;
+
+-- name: CreateGenresForUser :copyfrom
 INSERT INTO genres (
   "name",
   "user"
 ) VALUES (
   $1, $2
-)
-RETURNING *;
+);

@@ -66,7 +66,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateGenre  func(childComplexity int, input model.CreateGenreInput) int
+		CreateGenres func(childComplexity int, input []*model.CreateGenreInput) int
 		CreateMovie  func(childComplexity int, input model.CreateMovieInput) int
 		Login        func(childComplexity int, input model.LoginInput) int
 		RateMovie    func(childComplexity int, input model.RateMovieInput) int
@@ -84,7 +84,7 @@ type MutationResolver interface {
 	Login(ctx context.Context, input model.LoginInput) (*model.Authorization, error)
 	Register(ctx context.Context, input model.RegisterInput) (*model.Authorization, error)
 	RefreshToken(ctx context.Context) (*model.Authorization, error)
-	CreateGenre(ctx context.Context, input model.CreateGenreInput) (*model.Genre, error)
+	CreateGenres(ctx context.Context, input []*model.CreateGenreInput) ([]*model.Genre, error)
 	CreateMovie(ctx context.Context, input model.CreateMovieInput) (*model.Movie, error)
 	RateMovie(ctx context.Context, input model.RateMovieInput) (*model.Movie, error)
 }
@@ -192,17 +192,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Movie.UserRating(childComplexity), true
 
-	case "Mutation.createGenre":
-		if e.complexity.Mutation.CreateGenre == nil {
+	case "Mutation.createGenres":
+		if e.complexity.Mutation.CreateGenres == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createGenre_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createGenres_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateGenre(childComplexity, args["input"].(model.CreateGenreInput)), true
+		return e.complexity.Mutation.CreateGenres(childComplexity, args["input"].([]*model.CreateGenreInput)), true
 
 	case "Mutation.createMovie":
 		if e.complexity.Mutation.CreateMovie == nil {
@@ -394,7 +394,7 @@ var sources = []*ast.Source{
   register(input: RegisterInput!): Authorization!
   refreshToken: Authorization!
 
-  createGenre(input: CreateGenreInput!): Genre!
+  createGenres(input: [CreateGenreInput!]!): [Genre!]!
   createMovie(input: CreateMovieInput!): Movie!
   rateMovie(input: RateMovieInput!): Movie!
 }
@@ -464,13 +464,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createGenre_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createGenres_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CreateGenreInput
+	var arg0 []*model.CreateGenreInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateGenreInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateGenreInput2ᚕᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInputᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1307,8 +1307,8 @@ func (ec *executionContext) fieldContext_Mutation_refreshToken(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createGenre(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createGenre(ctx, field)
+func (ec *executionContext) _Mutation_createGenres(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createGenres(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1321,7 +1321,7 @@ func (ec *executionContext) _Mutation_createGenre(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateGenre(rctx, fc.Args["input"].(model.CreateGenreInput))
+		return ec.resolvers.Mutation().CreateGenres(rctx, fc.Args["input"].([]*model.CreateGenreInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1333,12 +1333,12 @@ func (ec *executionContext) _Mutation_createGenre(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Genre)
+	res := resTmp.([]*model.Genre)
 	fc.Result = res
-	return ec.marshalNGenre2ᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐGenre(ctx, field.Selections, res)
+	return ec.marshalNGenre2ᚕᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐGenreᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createGenre(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createGenres(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1361,7 +1361,7 @@ func (ec *executionContext) fieldContext_Mutation_createGenre(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createGenre_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createGenres_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3998,9 +3998,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createGenre":
+		case "createGenres":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createGenre(ctx, field)
+				return ec._Mutation_createGenres(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4491,18 +4491,31 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateGenreInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInput(ctx context.Context, v interface{}) (model.CreateGenreInput, error) {
+func (ec *executionContext) unmarshalNCreateGenreInput2ᚕᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInputᚄ(ctx context.Context, v interface{}) ([]*model.CreateGenreInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.CreateGenreInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateGenreInput2ᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateGenreInput2ᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateGenreInput(ctx context.Context, v interface{}) (*model.CreateGenreInput, error) {
 	res, err := ec.unmarshalInputCreateGenreInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCreateMovieInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐCreateMovieInput(ctx context.Context, v interface{}) (model.CreateMovieInput, error) {
 	res, err := ec.unmarshalInputCreateMovieInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNGenre2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐGenre(ctx context.Context, sel ast.SelectionSet, v model.Genre) graphql.Marshaler {
-	return ec._Genre(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNGenre2ᚕᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐGenreᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Genre) graphql.Marshaler {

@@ -6,7 +6,7 @@ import { useGenres } from "../genres/genres";
 
 interface Props {
   value?: MovieFormData
-  onSubmit: (value: MovieFormData) => void
+  onSubmit: (value: MovieFormData, newGenres: string[]) => void
   submitLabel?: string
 }
 
@@ -35,13 +35,26 @@ export const MovieForm: React.FC<Props> = (props) => {
   const [poster, setPoster] = useState(value?.poster ?? '')
   const [userRating, setUserRating] = useState(value?.userRating ?? null)
   const [genres, setGenres] = useState<Genre[]>(parsedGenres ?? [])
+  const [newGenres, setNewGenres] = useState<string[]>([])
 
   const onCastChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCast(e.target.value.split('\n'))
   }
 
-  const onGenreChange = (values: Genre[]) => {
-    setGenres(values)
+  const onGenreChange = (values: Array<Genre | string>) => {
+    const existingGenres: Genre[] = []
+    const newGenres: string[] = []
+
+    for (const value of values) {
+      if (typeof value === 'string') {
+        newGenres.push(value)
+      } else {
+        existingGenres.push(value)
+      }
+    }
+
+    setNewGenres(newGenres)
+    setGenres(existingGenres)
   }
 
   const onFormSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
@@ -55,7 +68,7 @@ export const MovieForm: React.FC<Props> = (props) => {
       poster,
       userRating: userRating ?? undefined,
       genres: genres.map(g => g.id)
-    })
+    }, newGenres)
   }
 
   return (
@@ -113,12 +126,25 @@ export const MovieForm: React.FC<Props> = (props) => {
         </FormControl>
         <FormControl>
           <FormLabel htmlFor="genres">Genres</FormLabel>
-          <Autocomplete multiple id="genres" options={availableGenres} getOptionLabel={opt => opt.name} renderInput={params => (
-            <TextField
-              {...params}
-              size="small"
-            />
-          )} onChange={(_, values) => onGenreChange(values)}/>
+          <Autocomplete
+            multiple
+            id="genres"
+            options={availableGenres}
+            freeSolo
+            getOptionLabel={opt => {
+              if (typeof opt === 'string') {
+                return opt
+              } else {
+                return opt.name
+              }
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                size="small"
+              />
+            )}
+            onChange={(_, values) => onGenreChange(values)}/>
         </FormControl>
         <FormControl>
           <FormLabel htmlFor="userRating">Your Rating</FormLabel>

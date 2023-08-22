@@ -101,28 +101,36 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.Authorizati
 	}, nil
 }
 
-// CreateGenre is the resolver for the createGenre field.
-func (r *mutationResolver) CreateGenre(ctx context.Context, input model.CreateGenreInput) (*model.Genre, error) {
-	r.Logger.Info("creating genre")
+// CreateGenres is the resolver for the createGenres field.
+func (r *mutationResolver) CreateGenres(ctx context.Context, input []*model.CreateGenreInput) ([]*model.Genre, error) {
+	r.Logger.Info("creating genres")
 
 	user := http.UserForContext(ctx)
 	if user == nil {
 		return nil, http.ErrUnauthorized
 	}
 
-	genreInput := genre.GenreInput{
-		Name: input.Name,
+	genresInput := make([]genre.GenreInput, len(input))
+	for i, gi := range input {
+		genresInput[i] = genre.GenreInput{
+			Name: gi.Name,
+		}
 	}
 
-	res, err := r.GenreRepository.CreateGenreForUser(ctx, genreInput, user.ID)
+	res, err := r.GenreRepository.CreateGenresForUser(ctx, genresInput, user.ID)
 	if err != nil {
-		r.Logger.Error("failed to create genre", "err", err)
+		r.Logger.Error("failed to create genres", "err", err)
 	}
 
-	return &model.Genre{
-		ID:   res.ID,
-		Name: res.Name,
-	}, nil
+	genres := make([]*model.Genre, len(res))
+	for i, g := range res {
+		genres[i] = &model.Genre{
+			ID:   g.ID,
+			Name: g.Name,
+		}
+	}
+
+	return genres, nil
 }
 
 // CreateMovie is the resolver for the createMovie field.
