@@ -131,6 +131,116 @@ func (_c *MockMovieRepository_GetGenres_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
+// GetMovieForUser provides a mock function with given fields: ctx, userID, movieID
+func (_m *MockMovieRepository) GetMovieForUser(ctx context.Context, userID string, movieID string) (Movie, error) {
+	ret := _m.Called(ctx, userID, movieID)
+
+	var r0 Movie
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (Movie, error)); ok {
+		return rf(ctx, userID, movieID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) Movie); ok {
+		r0 = rf(ctx, userID, movieID)
+	} else {
+		r0 = ret.Get(0).(Movie)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, userID, movieID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockMovieRepository_GetMovieForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetMovieForUser'
+type MockMovieRepository_GetMovieForUser_Call struct {
+	*mock.Call
+}
+
+// GetMovieForUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - movieID string
+func (_e *MockMovieRepository_Expecter) GetMovieForUser(ctx interface{}, userID interface{}, movieID interface{}) *MockMovieRepository_GetMovieForUser_Call {
+	return &MockMovieRepository_GetMovieForUser_Call{Call: _e.mock.On("GetMovieForUser", ctx, userID, movieID)}
+}
+
+func (_c *MockMovieRepository_GetMovieForUser_Call) Run(run func(ctx context.Context, userID string, movieID string)) *MockMovieRepository_GetMovieForUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *MockMovieRepository_GetMovieForUser_Call) Return(_a0 Movie, _a1 error) *MockMovieRepository_GetMovieForUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockMovieRepository_GetMovieForUser_Call) RunAndReturn(run func(context.Context, string, string) (Movie, error)) *MockMovieRepository_GetMovieForUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetMoviesForUser provides a mock function with given fields: ctx, userID, _a2
+func (_m *MockMovieRepository) GetMoviesForUser(ctx context.Context, userID string, _a2 *string) ([]Movie, error) {
+	ret := _m.Called(ctx, userID, _a2)
+
+	var r0 []Movie
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, *string) ([]Movie, error)); ok {
+		return rf(ctx, userID, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, *string) []Movie); ok {
+		r0 = rf(ctx, userID, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]Movie)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, *string) error); ok {
+		r1 = rf(ctx, userID, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockMovieRepository_GetMoviesForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetMoviesForUser'
+type MockMovieRepository_GetMoviesForUser_Call struct {
+	*mock.Call
+}
+
+// GetMoviesForUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - _a2 *string
+func (_e *MockMovieRepository_Expecter) GetMoviesForUser(ctx interface{}, userID interface{}, _a2 interface{}) *MockMovieRepository_GetMoviesForUser_Call {
+	return &MockMovieRepository_GetMoviesForUser_Call{Call: _e.mock.On("GetMoviesForUser", ctx, userID, _a2)}
+}
+
+func (_c *MockMovieRepository_GetMoviesForUser_Call) Run(run func(ctx context.Context, userID string, _a2 *string)) *MockMovieRepository_GetMoviesForUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(*string))
+	})
+	return _c
+}
+
+func (_c *MockMovieRepository_GetMoviesForUser_Call) Return(_a0 []Movie, _a1 error) *MockMovieRepository_GetMoviesForUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockMovieRepository_GetMoviesForUser_Call) RunAndReturn(run func(context.Context, string, *string) ([]Movie, error)) *MockMovieRepository_GetMoviesForUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockMovieRepository creates a new instance of MockMovieRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockMovieRepository(t interface {

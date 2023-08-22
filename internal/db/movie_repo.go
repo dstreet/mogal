@@ -122,3 +122,95 @@ func (repo *DBMovieRepository) GetGenres(ctx context.Context, movieID string) ([
 
 	return genres, nil
 }
+
+func (repo *DBMovieRepository) GetMoviesForUser(ctx context.Context, userID string, genre *string) ([]movie.Movie, error) {
+	repo.logger.Info("getting movies for user", "user", userID, "genre", genre)
+
+	userUUID, err := uuid.FromString(userID)
+	if err != nil {
+		repo.logger.Error("invalid uuid for user")
+		return nil, err
+	}
+
+	var movieRes []Movie
+
+	if genre != nil {
+		genreUUID, err := uuid.FromString(*genre)
+		if err != nil {
+			repo.logger.Error("invalid uuid for genre")
+			return nil, err
+		}
+
+		movieRes, err = repo.queries.GetMoviesForUserAndGenre(ctx, GetMoviesForUserAndGenreParams{
+			User:  userUUID,
+			Genre: genreUUID,
+		})
+
+		if err != nil {
+			repo.logger.Error("failed to get movie for user and genre", "err", err)
+			return nil, err
+		}
+	} else {
+		movieRes, err = repo.queries.GetMoviesForUser(ctx, userUUID)
+		if err != nil {
+			repo.logger.Error("failed to get movie for user", "err", err)
+			return nil, err
+		}
+	}
+
+	movies := make([]movie.Movie, len(movieRes))
+	for i, m := range movieRes {
+		movies[i] = updateMovieObjectWithDBMovie(movie.Movie{}, m)
+	}
+
+	return movies, nil
+}
+
+func (repo *DBMovieRepository) GetMovieForUser(ctx context.Context, userID string, movieId string) (movie.Movie, error) {
+	repo.logger.Info("getting movie for user", "user", userID, "movie", movieId)
+
+	var movieObj movie.Movie
+
+	userUUID, err := uuid.FromString(userID)
+	if err != nil {
+		repo.logger.Error("invalid uuid for user")
+		return movieObj, err
+	}
+
+	movieUUID, err := uuid.FromString(movieId)
+	if err != nil {
+		repo.logger.Error("invalid uuid for movie")
+		return movieObj, err
+	}
+
+	res, err := repo.queries.GetUserMovie(ctx, GetUserMovieParams{
+		User: userUUID,
+		ID:   movieUUID,
+	})
+	if err != nil {
+		repo.logger.Error("failed to get movie", "err", err)
+		return movie.Movie{}, err
+	}
+
+	updateMovieObjectWithDBMovie(movieObj, res)
+
+	return movieObj, nil
+}
+
+func updateMovieObjectWithDBMovie(movieObj movie.Movie, dbMovie Movie) movie.Movie {
+	movieObj.ID = dbMovie.ID.String()
+	movieObj.Title = dbMovie.Title
+	movieObj.Rating = dbMovie.Rating
+	movieObj.Cast = dbMovie.Cast
+	movieObj.Director = dbMovie.Director
+
+	if dbMovie.Poster.Valid {
+		movieObj.Poster = &dbMovie.Poster.String
+	}
+
+	if dbMovie.UserRating.Valid {
+		movieObj.UserRating = &dbMovie.UserRating.Int32
+	}
+
+	return movieObj
+}

@@ -26,6 +26,10 @@ type Genre struct {
 	Name string `json:"name"`
 }
 
+type GetMovieInput struct {
+	ID string `json:"id"`
+}
+
 type ListMoviesInput struct {
 	Genre *string `json:"genre,omitempty"`
 }

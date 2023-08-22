@@ -201,7 +201,44 @@ func (r *mutationResolver) RateMovie(ctx context.Context, input model.RateMovieI
 
 // ListMovies is the resolver for the listMovies field.
 func (r *queryResolver) ListMovies(ctx context.Context, input *model.ListMoviesInput) ([]*model.Movie, error) {
-	panic(fmt.Errorf("not implemented: ListMovies - listMovies"))
+	r.Logger.Info("getting movies for user")
+
+	user := http.UserForContext(ctx)
+	if user == nil {
+		r.Logger.Warn("unauthenticated request")
+		return nil, http.ErrUnauthorized
+	}
+
+	var genre *string
+
+	if input != nil {
+		genre = input.Genre
+	}
+
+	movies, err := r.MovieRepository.GetMoviesForUser(ctx, user.ID, genre)
+	if err != nil {
+		r.Logger.Error("failed to get movies for user", "user", user.ID)
+		return nil, err
+	}
+
+	moviesRes := make([]*model.Movie, len(movies))
+	for i, m := range movies {
+		moviesRes[i] = &model.Movie{
+			ID:       m.ID,
+			Title:    m.Title,
+			Rating:   m.Rating,
+			Cast:     m.Cast,
+			Director: m.Director,
+			Poster:   m.Poster,
+		}
+
+		if m.UserRating != nil {
+			ur := int(*m.UserRating)
+			moviesRes[i].UserRating = &ur
+		}
+	}
+
+	return moviesRes, nil
 }
 
 // ListGenres is the resolver for the listGenres field.
@@ -229,6 +266,39 @@ func (r *queryResolver) ListGenres(ctx context.Context) ([]*model.Genre, error) 
 	}
 
 	return mGenres, nil
+}
+
+// GetMovie is the resolver for the getMovie field.
+func (r *queryResolver) GetMovie(ctx context.Context, input model.GetMovieInput) (*model.Movie, error) {
+	r.Logger.Info("getting movie for user")
+
+	user := http.UserForContext(ctx)
+	if user == nil {
+		r.Logger.Warn("unauthenticated request")
+		return nil, http.ErrUnauthorized
+	}
+
+	movie, err := r.MovieRepository.GetMovieForUser(ctx, user.ID, input.ID)
+	if err != nil {
+		r.Logger.Error("failed to get movie", "user", user.ID, "movie", input.ID)
+		return nil, err
+	}
+
+	movieRes := &model.Movie{
+		ID:       movie.ID,
+		Title:    movie.Title,
+		Rating:   movie.Rating,
+		Cast:     movie.Cast,
+		Director: movie.Director,
+		Poster:   movie.Poster,
+	}
+
+	if movie.UserRating != nil {
+		ur := int(*movie.UserRating)
+		movieRes.UserRating = &ur
+	}
+
+	return movieRes, nil
 }
 
 // Mutation returns MutationResolver implementation.

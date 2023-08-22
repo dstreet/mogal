@@ -11,6 +11,7 @@ type Mutation {
 type Query {
   listMovies(input: ListMoviesInput): [Movie!]!
   listGenres: [Genre!]!
+  getMovie(input: GetMovieInput!): Movie!
 }
 
 type Authorization {
@@ -65,4 +66,8 @@ input CreateMovieInput {
 input RateMovieInput {
   movie: ID!
   userRating: Int!
+}
+
+input GetMovieInput {
+  id: ID!
 }

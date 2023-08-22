@@ -92,3 +92,107 @@ func (q *Queries) GetMovieGenres(ctx context.Context, movie uuid.UUID) ([]Genre,
 	}
 	return items, nil
 }
+
+const getMoviesForUser = `-- name: GetMoviesForUser :many
+SELECT id, title, rating, "cast", director, poster, "user", user_rating FROM movies
+WHERE "user" = $1
+ORDER BY "title" ASC
+`
+
+func (q *Queries) GetMoviesForUser(ctx context.Context, user uuid.UUID) ([]Movie, error) {
+	rows, err := q.db.Query(ctx, getMoviesForUser, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Movie
+	for rows.Next() {
+		var i Movie
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Rating,
+			&i.Cast,
+			&i.Director,
+			&i.Poster,
+			&i.User,
+			&i.UserRating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMoviesForUserAndGenre = `-- name: GetMoviesForUserAndGenre :many
+SELECT movies.id, movies.title, movies.rating, movies."cast", movies.director, movies.poster, movies."user", movies.user_rating FROM movies
+INNER JOIN movie_genres mg on mg.movie = movies.id
+WHERE movies.user = $1
+AND mg.genre = $2
+ORDER BY movies.title ASC
+`
+
+type GetMoviesForUserAndGenreParams struct {
+	User  uuid.UUID
+	Genre uuid.UUID
+}
+
+func (q *Queries) GetMoviesForUserAndGenre(ctx context.Context, arg GetMoviesForUserAndGenreParams) ([]Movie, error) {
+	rows, err := q.db.Query(ctx, getMoviesForUserAndGenre, arg.User, arg.Genre)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Movie
+	for rows.Next() {
+		var i Movie
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Rating,
+			&i.Cast,
+			&i.Director,
+			&i.Poster,
+			&i.User,
+			&i.UserRating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserMovie = `-- name: GetUserMovie :one
+SELECT id, title, rating, "cast", director, poster, "user", user_rating FROM movies
+WHERE "id" = $1
+AND "user" = $2
+`
+
+type GetUserMovieParams struct {
+	ID   uuid.UUID
+	User uuid.UUID
+}
+
+func (q *Queries) GetUserMovie(ctx context.Context, arg GetUserMovieParams) (Movie, error) {
+	row := q.db.QueryRow(ctx, getUserMovie, arg.ID, arg.User)
+	var i Movie
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Rating,
+		&i.Cast,
+		&i.Director,
+		&i.Poster,
+		&i.User,
+		&i.UserRating,
+	)
+	return i, err
+}

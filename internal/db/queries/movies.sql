@@ -25,3 +25,20 @@ SELECT genres.* FROM genres
 INNER JOIN movie_genres mg ON mg.genre = genres.id
 WHERE mg.movie = $1
 ORDER BY genres.name ASC;
+
+-- name: GetMoviesForUser :many
+SELECT * FROM movies
+WHERE "user" = $1
+ORDER BY "title" ASC;
+
+-- name: GetMoviesForUserAndGenre :many
+SELECT movies.* FROM movies
+INNER JOIN movie_genres mg on mg.movie = movies.id
+WHERE movies.user = $1
+AND mg.genre = $2
+ORDER BY movies.title ASC;
+
+-- name: GetUserMovie :one
+SELECT * FROM movies
+WHERE "id" = $1
+AND "user" = $2;
