@@ -33,7 +33,7 @@ export const AuthenticatedPage: React.FC<Props> = (props) => {
         </Toolbar>
       </AppBar>
       <Box component="main" sx={{ p: 2 }}>
-        <MovieForm availableGenres={[{ id: '1', name: 'Action'},{id:'2', name: 'Horror'}]} onSubmit={onFormSubmit}/>
+        <MovieForm onSubmit={onFormSubmit}/>
         <Outlet/>
       </Box>
     </Box>

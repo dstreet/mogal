@@ -2,10 +2,10 @@ import { Autocomplete, Box, Button, FormControl, FormLabel, Input, MenuItem, Rat
 import ImageIcon from '@mui/icons-material/Image';
 import { Genre } from "../genres/genres.interface"
 import { useState } from "react";
+import { useGenres } from "../genres/genres";
 
 interface Props {
   value?: MovieFormData
-  availableGenres: Genre[]
   onSubmit: (value: MovieFormData) => void
   submitLabel?: string
 }
@@ -21,9 +21,9 @@ export interface MovieFormData {
 }
 
 export const MovieForm: React.FC<Props> = (props) => {
-  const { value, availableGenres, onSubmit, submitLabel = "Create" } = props
+  const { value, onSubmit, submitLabel = "Create" } = props
+  const { genres: availableGenres } = useGenres()
 
-  //ts-ignore
   const parsedGenres = value?.genres
     .map(id => availableGenres.find(ag => ag.id === id))
     .filter(Boolean) as Genre[]
@@ -34,7 +34,7 @@ export const MovieForm: React.FC<Props> = (props) => {
   const [director, setDirector] = useState(value?.director ?? '')
   const [poster, setPoster] = useState(value?.poster ?? '')
   const [userRating, setUserRating] = useState(value?.userRating ?? null)
-  const [genres, setGenres] = useState(parsedGenres ?? [])
+  const [genres, setGenres] = useState<Genre[]>(parsedGenres ?? [])
 
   const onCastChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCast(e.target.value.split('\n'))

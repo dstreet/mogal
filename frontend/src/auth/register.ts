@@ -1,4 +1,3 @@
-import request, { GraphQLClient } from 'graphql-request'
 import { useMutation } from '@tanstack/react-query'
 import { graphql } from "../gql";
 import { RegisterUserMutationVariables } from '../gql/graphql';
