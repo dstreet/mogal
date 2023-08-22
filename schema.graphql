@@ -9,7 +9,7 @@ type Mutation {
 }
 
 type Query {
-  listMovies(input: ListMoviesInput): [Movie!]!
+  listMovies(input: ListMoviesInput!): [Movie!]!
   listGenres: [Genre!]!
   getMovie(input: GetMovieInput!): Movie!
 }

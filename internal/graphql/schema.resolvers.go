@@ -200,7 +200,7 @@ func (r *mutationResolver) RateMovie(ctx context.Context, input model.RateMovieI
 }
 
 // ListMovies is the resolver for the listMovies field.
-func (r *queryResolver) ListMovies(ctx context.Context, input *model.ListMoviesInput) ([]*model.Movie, error) {
+func (r *queryResolver) ListMovies(ctx context.Context, input model.ListMoviesInput) ([]*model.Movie, error) {
 	r.Logger.Info("getting movies for user")
 
 	user := http.UserForContext(ctx)
@@ -209,13 +209,13 @@ func (r *queryResolver) ListMovies(ctx context.Context, input *model.ListMoviesI
 		return nil, http.ErrUnauthorized
 	}
 
-	var genre *string
+	// var genre *string
 
-	if input != nil {
-		genre = input.Genre
-	}
+	// if input != nil {
+	// 	genre = input.Genre
+	// }
 
-	movies, err := r.MovieRepository.GetMoviesForUser(ctx, user.ID, genre)
+	movies, err := r.MovieRepository.GetMoviesForUser(ctx, user.ID, input.Genre)
 	if err != nil {
 		r.Logger.Error("failed to get movies for user", "user", user.ID)
 		return nil, err

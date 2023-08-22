@@ -77,7 +77,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetMovie   func(childComplexity int, input model.GetMovieInput) int
 		ListGenres func(childComplexity int) int
-		ListMovies func(childComplexity int, input *model.ListMoviesInput) int
+		ListMovies func(childComplexity int, input model.ListMoviesInput) int
 	}
 }
 
@@ -90,7 +90,7 @@ type MutationResolver interface {
 	RateMovie(ctx context.Context, input model.RateMovieInput) (*model.Movie, error)
 }
 type QueryResolver interface {
-	ListMovies(ctx context.Context, input *model.ListMoviesInput) ([]*model.Movie, error)
+	ListMovies(ctx context.Context, input model.ListMoviesInput) ([]*model.Movie, error)
 	ListGenres(ctx context.Context) ([]*model.Genre, error)
 	GetMovie(ctx context.Context, input model.GetMovieInput) (*model.Movie, error)
 }
@@ -290,7 +290,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListMovies(childComplexity, args["input"].(*model.ListMoviesInput)), true
+		return e.complexity.Query.ListMovies(childComplexity, args["input"].(model.ListMoviesInput)), true
 
 	}
 	return 0, false
@@ -415,7 +415,7 @@ var sources = []*ast.Source{
 }
 
 type Query {
-  listMovies(input: ListMoviesInput): [Movie!]!
+  listMovies(input: ListMoviesInput!): [Movie!]!
   listGenres: [Genre!]!
   getMovie(input: GetMovieInput!): Movie!
 }
@@ -592,10 +592,10 @@ func (ec *executionContext) field_Query_getMovie_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Query_listMovies_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ListMoviesInput
+	var arg0 model.ListMoviesInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOListMoviesInput2ᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐListMoviesInput(ctx, tmp)
+		arg0, err = ec.unmarshalNListMoviesInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐListMoviesInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1563,7 +1563,7 @@ func (ec *executionContext) _Query_listMovies(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListMovies(rctx, fc.Args["input"].(*model.ListMoviesInput))
+		return ec.resolvers.Query().ListMovies(rctx, fc.Args["input"].(model.ListMoviesInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4766,6 +4766,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNListMoviesInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐListMoviesInput(ctx context.Context, v interface{}) (model.ListMoviesInput, error) {
+	res, err := ec.unmarshalInputListMoviesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5179,14 +5184,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalOListMoviesInput2ᚖgithubᚗcomᚋdstreetᚋmogalᚋinternalᚋgraphqlᚋmodelᚐListMoviesInput(ctx context.Context, v interface{}) (*model.ListMoviesInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputListMoviesInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

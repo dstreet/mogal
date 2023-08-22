@@ -12,10 +12,9 @@ interface Props {
 
 export const CreateMovieDialog: React.FC<Props> = (props) => {
   const { open, onCancel, onCreate } = props
-  const { loading, success, error, movie, createMovie } = useCreateMovie()
+  const { success, error, movie, createMovie } = useCreateMovie()
 
   const onSubmit = (value: MovieFormData, newGenres: string[]) => {
-    console.log(newGenres, value.genres)
     createMovie(value, newGenres)
   }
 
