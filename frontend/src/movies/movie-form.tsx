@@ -27,6 +27,8 @@ export const MovieForm: React.FC<Props> = (props) => {
   const parsedGenres = value?.genres
     .map(id => availableGenres.find(ag => ag.id === id))
     .filter(Boolean) as Genre[]
+
+  console.log(value?.genres, parsedGenres)
   
   const [title, setTitle] = useState(value?.title ?? '')
   const [rating, setRating] = useState(value?.rating ?? '')
@@ -138,6 +140,7 @@ export const MovieForm: React.FC<Props> = (props) => {
                 return opt.name
               }
             }}
+            value={genres}
             renderInput={params => (
               <TextField
                 {...params}

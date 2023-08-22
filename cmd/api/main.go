@@ -13,7 +13,7 @@ import (
 	"github.com/dstreet/mogal/internal/db"
 	"github.com/dstreet/mogal/internal/graphql"
 	mhttp "github.com/dstreet/mogal/internal/http"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 
@@ -74,7 +74,7 @@ func main() {
 	)
 
 	// conn, err := sql.Open("postgres", cs)
-	conn, err := pgx.Connect(context.TODO(), cs)
+	conn, err := pgxpool.New(context.TODO(), cs)
 	if err != nil {
 		panic(err)
 	}

@@ -14,6 +14,10 @@ const ListMoviesQuery = graphql(`
       director
       poster
       userRating
+      genres {
+        id
+        name
+      }
     }
   }
 `)
@@ -28,6 +32,10 @@ const GetMovieQuery = graphql(`
       director
       poster
       userRating
+      genres {
+        id
+        name
+      }
     }
   }
 `)
@@ -48,7 +56,6 @@ export const useMovies = (genre?: string) => {
       ...m,
       poster: m.poster ?? undefined,
       userRating: m.userRating ?? undefined,
-      genres: []
     }))
   }
 
@@ -74,8 +81,7 @@ export const useMovie = (id: string) => {
     movie = {
       ...data.getMovie,
       poster: data.getMovie.poster ?? undefined,
-      userRating: data.getMovie.userRating ?? undefined,
-      genres: []
+      userRating: data.getMovie.userRating ?? undefined
     }
   }
 

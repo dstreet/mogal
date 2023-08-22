@@ -126,7 +126,7 @@ func (repo *DBUserRepository) GetWithID(ctx context.Context, ID string) (user.Us
 
 	u, err := repo.queries.GetUserWithId(ctx, uuidID)
 	if err != nil {
-		repo.logger.Error("failed to get user from DB", "err", err)
+		repo.logger.Error("failed to get user from DB", "user", ID, "err", err)
 		return userObj, err
 	}
 

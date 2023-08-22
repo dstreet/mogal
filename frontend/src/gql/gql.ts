@@ -18,8 +18,8 @@ const documents = {
     "\n  query ListGenres {\n    listGenres {\n      id\n      name\n    }\n  }\n": types.ListGenresDocument,
     "\n  mutation CreateMovie(\n    $title: String!\n    $rating: String!\n    $cast: [String!]!\n    $director: String!\n    $poster: String\n    $userRating: Int\n    $genres: [String!]!\n  ) {\n    createMovie(input: {\n      title: $title,\n      rating: $rating,\n      cast: $cast,\n      director: $director,\n      poster: $poster,\n      userRating: $userRating,\n      genres: $genres\n    }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n": types.CreateMovieDocument,
     "\n  mutation CreateGenres($input: [CreateGenreInput!]!) {\n    createGenres(input: $input) {\n      id\n      name\n    }\n  }\n": types.CreateGenresDocument,
-    "\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n": types.ListMoviesDocument,
-    "\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n": types.GetMovieDocument,
+    "\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n": types.ListMoviesDocument,
+    "\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n": types.GetMovieDocument,
 };
 
 /**
@@ -59,11 +59,11 @@ export function graphql(source: "\n  mutation CreateGenres($input: [CreateGenreI
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n"): (typeof documents)["\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n"];
+export function graphql(source: "\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query ListMovies($genre: String) {\n    listMovies(input: { genre: $genre }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n"): (typeof documents)["\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n    }\n  }\n"];
+export function graphql(source: "\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetMovie($id: ID!) {\n    getMovie(input: { id: $id }) {\n      id\n      title\n      rating\n      cast\n      director\n      poster\n      userRating\n      genres {\n        id\n        name\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

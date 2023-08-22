@@ -209,12 +209,6 @@ func (r *queryResolver) ListMovies(ctx context.Context, input model.ListMoviesIn
 		return nil, http.ErrUnauthorized
 	}
 
-	// var genre *string
-
-	// if input != nil {
-	// 	genre = input.Genre
-	// }
-
 	movies, err := r.MovieRepository.GetMoviesForUser(ctx, user.ID, input.Genre)
 	if err != nil {
 		r.Logger.Error("failed to get movies for user", "user", user.ID)
@@ -235,6 +229,24 @@ func (r *queryResolver) ListMovies(ctx context.Context, input model.ListMoviesIn
 		if m.UserRating != nil {
 			ur := int(*m.UserRating)
 			moviesRes[i].UserRating = &ur
+		}
+	}
+
+	fields := r.FieldCollector.CollectAllFields(ctx)
+	if slices.Contains(fields, "genres") {
+		for _, m := range moviesRes {
+			genres, err := r.MovieRepository.GetGenres(ctx, m.ID)
+			if err != nil {
+				r.Logger.Error("failed to get genres for movie", "movie", m.ID)
+				return moviesRes, err
+			}
+
+			for _, g := range genres {
+				m.Genres = append(m.Genres, &model.Genre{
+					ID:   g.ID,
+					Name: g.Name,
+				})
+			}
 		}
 	}
 
