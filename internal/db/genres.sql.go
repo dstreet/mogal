@@ -11,6 +11,28 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+const createGenreForUser = `-- name: CreateGenreForUser :one
+INSERT INTO genres (
+  "name",
+  "user"
+) VALUES (
+  $1, $2
+)
+RETURNING id, "user", name
+`
+
+type CreateGenreForUserParams struct {
+	Name string
+	User uuid.UUID
+}
+
+func (q *Queries) CreateGenreForUser(ctx context.Context, arg CreateGenreForUserParams) (Genre, error) {
+	row := q.db.QueryRow(ctx, createGenreForUser, arg.Name, arg.User)
+	var i Genre
+	err := row.Scan(&i.ID, &i.User, &i.Name)
+	return i, err
+}
+
 const getUserGenres = `-- name: GetUserGenres :many
 SELECT id, "user", name from genres
 WHERE "user" = $1

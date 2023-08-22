@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/dstreet/mogal/internal/genre"
 	"github.com/dstreet/mogal/internal/graphql/model"
 	"github.com/dstreet/mogal/internal/http"
 	"github.com/dstreet/mogal/internal/movie"
@@ -102,7 +103,26 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.Authorizati
 
 // CreateGenre is the resolver for the createGenre field.
 func (r *mutationResolver) CreateGenre(ctx context.Context, input model.CreateGenreInput) (*model.Genre, error) {
-	panic(fmt.Errorf("not implemented: CreateGenre - createGenre"))
+	r.Logger.Info("creating genre")
+
+	user := http.UserForContext(ctx)
+	if user == nil {
+		return nil, http.ErrUnauthorized
+	}
+
+	genreInput := genre.GenreInput{
+		Name: input.Name,
+	}
+
+	res, err := r.GenreRepository.CreateGenreForUser(ctx, genreInput, user.ID)
+	if err != nil {
+		r.Logger.Error("failed to create genre", "err", err)
+	}
+
+	return &model.Genre{
+		ID:   res.ID,
+		Name: res.Name,
+	}, nil
 }
 
 // CreateMovie is the resolver for the createMovie field.

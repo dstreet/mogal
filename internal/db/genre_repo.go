@@ -46,3 +46,29 @@ func (repo *DBGenreRepository) GetAllForUser(ctx context.Context, userID string)
 
 	return userGenres, nil
 }
+
+func (repo *DBGenreRepository) CreateGenreForUser(ctx context.Context, genreInput genre.GenreInput, userID string) (genre.Genre, error) {
+	repo.logger.Info("create a new genre for user", "user", userID)
+
+	userUUID, err := uuid.FromString(userID)
+	if err != nil {
+		repo.logger.Error("invalid uuid")
+		return genre.Genre{}, err
+	}
+
+	args := CreateGenreForUserParams{
+		Name: genreInput.Name,
+		User: userUUID,
+	}
+
+	res, err := repo.queries.CreateGenreForUser(ctx, args)
+	if err != nil {
+		repo.logger.Error("failed to create genre for user", "err", err)
+		return genre.Genre{}, err
+	}
+
+	return genre.Genre{
+		ID:   res.ID.String(),
+		Name: res.Name,
+	}, nil
+}

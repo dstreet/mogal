@@ -167,6 +167,48 @@ func Test_MutationResolver_Register(t *testing.T) {
 	})
 }
 
+func Test_MutationResolver_CreateGenre(t *testing.T) {
+	gr := genre.NewMockGenreRepository(t)
+
+	resolver := &graphql.Resolver{
+		Logger:          testLogger,
+		GenreRepository: gr,
+	}
+
+	mr := resolver.Mutation()
+
+	t.Run("throws unathorized when the user isn't authenticated", func(t *testing.T) {
+		_, err := mr.CreateMovie(context.Background(), model.CreateMovieInput{})
+		assert.ErrorIs(t, err, http.ErrUnauthorized)
+	})
+
+	t.Run("creates and returns the genre", func(t *testing.T) {
+		user := user.User{ID: "1234567890"}
+		ctx := context.WithValue(context.Background(), http.UserCtxKey, &user)
+
+		input := model.CreateGenreInput{
+			Name: "Horror",
+		}
+
+		id := "1234567890"
+
+		gr.EXPECT().CreateGenreForUser(mock.Anything, genre.GenreInput{
+			Name: input.Name,
+		}, user.ID).
+			Return(genre.Genre{
+				ID:   id,
+				Name: input.Name,
+			}, nil).
+			Once()
+
+		res, err := mr.CreateGenre(ctx, input)
+		assert.NoError(t, err)
+
+		assert.Equal(t, id, res.ID)
+		assert.Equal(t, input.Name, res.Name)
+	})
+}
+
 func Test_QueryResolver_ListGenres(t *testing.T) {
 	gr := genre.NewMockGenreRepository(t)
 
