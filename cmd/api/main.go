@@ -109,6 +109,7 @@ func main() {
 		GenreRepository: genreRepo,
 		MovieRepository: movieRepo,
 		TokenProvider:   tokenProvider,
+		FieldCollector:  &graphql.GraphQLFieldCollector{},
 	}
 
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: resolver}))

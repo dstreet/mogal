@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControl, FormLabel, Input, MenuItem, Rating, Select, SelectChangeEvent, TextField } from "@mui/material"
+import { Autocomplete, Box, Button, FormControl, FormLabel, MenuItem, Rating, Select, TextField } from "@mui/material"
 import ImageIcon from '@mui/icons-material/Image';
 import { Genre } from "../genres/genres.interface"
 import { useState } from "react";
@@ -117,7 +117,6 @@ export const MovieForm: React.FC<Props> = (props) => {
             <TextField
               {...params}
               size="small"
-              required
             />
           )} onChange={(_, values) => onGenreChange(values)}/>
         </FormControl>
