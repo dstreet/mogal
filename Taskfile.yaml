@@ -9,9 +9,9 @@ env:
 
 tasks:
   setup:
-    cmds:
-      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-      - go install github.com/vektra/mockery/v2@v2.32.4
+    deps:
+      - api.install
+      - ui.install
 
   sqlc:
     cmds:
@@ -26,18 +26,36 @@ tasks:
     cmds:
       - go generate ./internal/...
 
-  dev:api:
-    cmds:
-      - go run cmd/api/main.go
-
-  run:
+  up:
     cmds:
       - docker-compose up
 
-  build:api:
+  down:
+    cmds:
+      - docker-compose down {{ .CLI_ARGS }}
+
+  api.install:
+    cmds:
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+      - go install github.com/vektra/mockery/v2@v2.32.4
+
+  api.dev:
+    cmds:
+      - go run cmd/api/main.go
+
+  api.build:
     cmds:
       - go build -o build/api cmd/api/main.go
 
-  migrate:
+  api.migrate.up:
     cmds:
-      - npx dbmate {{ .CLI_ARGS }}
+      - npx dbmate up
+
+  api.migrate.down:
+    cmds:
+      - npx dbmate down
+
+  ui.install:
+    dir: ui
+    cmds:
+      - npm i

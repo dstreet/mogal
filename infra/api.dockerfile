@@ -17,7 +17,7 @@ COPY cmd/api cmd/api
 COPY internal internal
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} task build.api
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} task api.build
 
 # Run stage
 # ---

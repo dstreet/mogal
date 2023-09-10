@@ -23,9 +23,11 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
 	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		logger.Warn("no .env file found")
 	}
 
 	port := os.Getenv("PORT")
@@ -62,8 +64,6 @@ func main() {
 	if authSigningKey == "" {
 		panic("missing AUTH_SIGNING_KEY")
 	}
-
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 
 	cs := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s sslmode=disable",
