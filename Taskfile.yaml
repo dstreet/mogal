@@ -19,7 +19,8 @@ tasks:
 
   gql:
     cmds:
-      - go run github.com/99designs/gqlgen generate
+      - task: api.gql
+      - task: ui.gql
 
   generate:
     deps: [sqlc, gql]
@@ -51,6 +52,10 @@ tasks:
     cmds:
       - go build -o build/api cmd/api/main.go
 
+  api.gql:
+    cmds:
+      - go run github.com/99designs/gqlgen generate
+
   db.migrate.up:
     cmds:
       - npx dbmate up
@@ -63,3 +68,8 @@ tasks:
     dir: ui
     cmds:
       - npm i
+  
+  ui.gql:
+    dir: ui
+    cmds:
+      - npx graphql-codegen
