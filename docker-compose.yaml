@@ -13,6 +13,8 @@ services:
     build:
       context: .
       dockerfile: infra/ui.dockerfile
+      args:
+        API_ENDPOINT: http://localhost:8080/graphql
     env_file:
       - .env
     ports:

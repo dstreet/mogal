@@ -3,8 +3,10 @@
 # Build stage
 # ---
 FROM node:18-alpine AS build
+ARG API_ENDPOINT
 
 ENV NODE_ENV production
+ENV REACT_APP_API_ENDPOINT $API_ENDPOINT
 WORKDIR /app
 
 COPY ui/package.json .
