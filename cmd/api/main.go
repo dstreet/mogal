@@ -73,7 +73,6 @@ func main() {
 		dbName,
 	)
 
-	// conn, err := sql.Open("postgres", cs)
 	conn, err := pgxpool.New(context.TODO(), cs)
 	if err != nil {
 		panic(err)

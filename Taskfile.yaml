@@ -34,6 +34,10 @@ tasks:
     cmds:
       - docker-compose down {{ .CLI_ARGS }}
 
+  db:
+    cmds:
+      - docker-compse up db
+
   api.install:
     cmds:
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
@@ -47,11 +51,11 @@ tasks:
     cmds:
       - go build -o build/api cmd/api/main.go
 
-  api.migrate.up:
+  db.migrate.up:
     cmds:
       - npx dbmate up
 
-  api.migrate.down:
+  db.migrate.down:
     cmds:
       - npx dbmate down
 
