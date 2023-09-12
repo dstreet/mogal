@@ -2,7 +2,7 @@
 
 The Movie Gallery
 
-## Dev Setup
+## Getting Started
 
 This project uses [Task](https://taskfile.dev/) as its task runner. Follow the [installation instructions](https://taskfile.dev/installation/) for your system to install.
 
@@ -31,3 +31,29 @@ task db.migrate.up
 ```
 
 Once the application is up and running, you can view it at: http://localhost:3000
+
+## Development
+
+## Starting the Database
+
+```sh
+task db
+```
+
+## Starting the API
+
+```sh
+task api.dev
+```
+
+## Starting the UI
+
+```sh
+task ui.dev
+```
+
+## Tests
+
+```sh
+task test
+```

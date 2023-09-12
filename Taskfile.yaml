@@ -39,6 +39,9 @@ tasks:
     cmds:
       - docker-compse up db
 
+  test:
+    deps: [api.test]
+
   api.install:
     cmds:
       - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
@@ -56,6 +59,10 @@ tasks:
     cmds:
       - go run github.com/99designs/gqlgen generate
 
+  api.test:
+    cmds:
+      - go test ./...
+
   db.migrate.up:
     cmds:
       - npx dbmate up
@@ -68,6 +75,11 @@ tasks:
     dir: ui
     cmds:
       - npm i
+
+  ui.dev:
+    dir: ui
+    cmds:
+      - npm run start
   
   ui.gql:
     dir: ui
