@@ -40,13 +40,13 @@ Once the application is up and running, you can view it at: http://localhost:300
 task db
 ```
 
-## Starting the API
+### Starting the API
 
 ```sh
 task api.dev
 ```
 
-## Starting the UI
+### Starting the UI
 
 ```sh
 task ui.dev
