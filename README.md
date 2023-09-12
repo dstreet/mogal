@@ -34,7 +34,7 @@ Once the application is up and running, you can view it at: http://localhost:300
 
 ## Development
 
-## Starting the Database
+### Starting the Database
 
 ```sh
 task db
